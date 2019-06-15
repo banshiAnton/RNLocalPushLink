@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
-import { Button, StyleSheet, Text, View, AppState } from 'react-native'
+import { Button, StyleSheet, Text, View, AppState, Picker } from 'react-native'
 import PushNotification from 'react-native-push-notification'
 
 export default class App extends Component {
+
+  timeout = 10
 
   _configPush() {
     PushNotification.configure({
@@ -55,11 +57,12 @@ export default class App extends Component {
     }
   }
 
-  _pushShedul() {
+  _pushShedul = () => {
     console.log('ON ACTIVE')
+    const { timeout } = this
     PushNotification.localNotificationSchedule({
       message: "My Notification Message", // (required)
-      date: new Date(Date.now() + (10 * 1000)) // in 60 secs
+      date: new Date(Date.now() + (timeout * 1000)) // in 60 secs
     })
   }
   
@@ -98,6 +101,16 @@ export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Picker
+          selectedValue={10}
+          style={{height: 50, width: 100}}
+          onValueChange={itemValue =>
+            this.timeout = +itemValue
+          }>
+          {
+            [...new Array(120)].map(val => <Picker.Item label={val} value={val} />)
+          }
+        </Picker>
         <Text style={styles.welcome}>Welcome to React Native!</Text>
         <Button title="create push notification" onPress={this._createLocalPush} />
       </View>
