@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Button, StyleSheet, Text, View, AppState, Picker, Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
+import DeviceInfo from 'react-native-device-info'
 import ConnectyCube from 'connectycube-reactnative'
 
 ConnectyCube.init({
@@ -23,9 +24,9 @@ export default class App extends Component {
 
         // (optional) Called when Token is generated (iOS and Android)
         onRegister: this.onSubscribe,
-    
-        // (required) Called when a remote or local notification is opened or received
-        onNotification: this.onNotification,
+  
+      // (required) Called when a remote or local notification is opened or received
+       onNotification: this.onNotification,
     
         // ANDROID ONLY: GCM Sender ID (optional - not required for local notifications, but is need to receive remote push notifications) 
         senderID: SENDER_ID,
@@ -51,24 +52,31 @@ export default class App extends Component {
   }
 
   onSubscribe(register) {
-    // const params = {
-    //   notification_channels: 'gcm',
-    //   push_token: {
-    //     environment: __DEV__ ? 'development' : 'production',
-    //     client_identification_sequence: register.token
-    //   }
-    // }
+    const params = {
+      notification_channels: Platform.OS === 'ios' ? 'apns' : 'gcm',
+      device: {
+        platform: Platform.OS,
+        udid: DeviceInfo.getUniqueID()
+      },
+      push_token: {
+        environment: __DEV__ ? 'development' : 'production',
+        client_identification_sequence: register.token
+      }
+    }
 
-    // console.log('[PushNotificationService][onSubscribe] params', params)
+    console.log('[PushNotificationService][onSubscribe] params', params)
 
-    // ConnectyCube.pushnotifications.subscriptions.create(params, (error, response) => {
-    //   console.warn({ error, response })
-    // })
-    console.log('[PushNotificationService][onNotification] reg', arguments)
+    ConnectyCube.createSession({ login: 'testeranton', password: '12345678' }, (error, session) => {
+      console.warn({ error, session })
+      ConnectyCube.pushnotifications.subscriptions.create(params, (error, response) => {
+        console.warn({ error, response })
+      })
+    })
+    console.log('[PushNotificationService][onNotification] reg', register)
   }
 
   onNotification(message) {
-    console.log('[PushNotificationService][onNotification] message', arguments)
+    console.log('[PushNotificationService][onNotification] message', message)
   }
 
   componentDidMount() {
