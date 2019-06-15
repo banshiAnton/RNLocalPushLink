@@ -4,7 +4,9 @@ import PushNotification from 'react-native-push-notification'
 
 export default class App extends Component {
 
-  timeout = 10
+  state = {
+    timeout: '10'
+  }
 
   _configPush() {
     PushNotification.configure({
@@ -59,10 +61,10 @@ export default class App extends Component {
 
   _pushShedul = () => {
     console.log('ON ACTIVE')
-    const { timeout } = this
+    const { timeout } = this.state
     PushNotification.localNotificationSchedule({
       message: "My Notification Message", // (required)
-      date: new Date(Date.now() + (timeout * 1000)) // in 60 secs
+      date: new Date(Date.now() + (+timeout * 1000)) // in 60 secs
     })
   }
   
@@ -102,13 +104,11 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <Picker
-          selectedValue={10}
-          style={{height: 50, width: 100}}
-          onValueChange={itemValue =>
-            this.timeout = +itemValue
-          }>
+          selectedValue={this.state.timeout}
+          style={{height: 50, width: 70}}
+          onValueChange={ timeout => this.setState({ timeout }) }>
           {
-            [...new Array(120)].map(val => <Picker.Item label={val} value={val} />)
+            [...new Array(120)].map((val, i) => <Picker.Item key={i} label={i + ''} value={i + ''} />)
           }
         </Picker>
         <Text style={styles.welcome}>Welcome to React Native!</Text>
