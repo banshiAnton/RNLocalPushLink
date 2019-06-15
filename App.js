@@ -1,7 +1,17 @@
 import React, { Component } from 'react'
-import { Button, StyleSheet, Text, View, AppState, Picker } from 'react-native'
+import { Button, StyleSheet, Text, View, AppState, Picker, Platform } from 'react-native'
 import PushNotification from 'react-native-push-notification'
+import ConnectyCube from 'connectycube-reactnative'
 
+ConnectyCube.init({
+  appId: 617,
+  authKey: 'EuttymgdCkUQbCr',
+  authSecret: 'RquZgHxx5DXUWK8'
+}, {
+  debug: { mode: 1 }
+})
+
+const SENDER_ID = '275286813344'
 export default class App extends Component {
 
   state = {
@@ -12,17 +22,13 @@ export default class App extends Component {
     PushNotification.configure({
 
         // (optional) Called when Token is generated (iOS and Android)
-        onRegister: function(token) {
-            console.log( 'TOKEN:', token );
-        },
+        onRegister: this.onSubscribe,
     
         // (required) Called when a remote or local notification is opened or received
-        onNotification: function(notification) {
-            console.log( 'NOTIFICATION:', notification );
-        },
+        onNotification: this.onNotification,
     
         // ANDROID ONLY: GCM Sender ID (optional - not required for local notifications, but is need to receive remote push notifications) 
-        //senderID: "YOUR GCM SENDER ID",
+        senderID: SENDER_ID,
     
         // IOS ONLY (optional): default: all - Permissions to register.
         permissions: {
@@ -42,6 +48,27 @@ export default class App extends Component {
           */
         requestPermissions: true,
     });
+  }
+
+  onSubscribe(register) {
+    // const params = {
+    //   notification_channels: 'gcm',
+    //   push_token: {
+    //     environment: __DEV__ ? 'development' : 'production',
+    //     client_identification_sequence: register.token
+    //   }
+    // }
+
+    // console.log('[PushNotificationService][onSubscribe] params', params)
+
+    // ConnectyCube.pushnotifications.subscriptions.create(params, (error, response) => {
+    //   console.warn({ error, response })
+    // })
+    console.log('[PushNotificationService][onNotification] reg', arguments)
+  }
+
+  onNotification(message) {
+    console.log('[PushNotificationService][onNotification] message', arguments)
   }
 
   componentDidMount() {
